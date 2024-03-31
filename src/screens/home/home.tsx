@@ -1,4 +1,4 @@
-import { FlatList, Image, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
+import { FlatList, Image, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { Menu, Profile } from '../../assests'
 import { SearchSvg } from '../../assests'
@@ -6,12 +6,12 @@ import * as Animatable from 'react-native-animatable';
 import { useFetchCarsApiQuery } from '../../redux/query/CarsQuery';
 import { shadow } from '../../common/shadow';
 
-const Home = () => {
+const Home = ({navigation}:any) => {
   const arrTypes = ["All", "Jeep", "Audi", "Bently", "Jaguar", "Volvo", "Toyota"]
   const [selType, setSelType] = useState<string>("All")
   const [arrdata, setData] = useState<any[]>();
   const { data: products = [], isSuccess }: any = useFetchCarsApiQuery("");
-  const onPressType=async(item:any)=>{
+  const onPressType = async (item: any) => {
     setSelType(item)
   }
   const carTypeList = () => {
@@ -19,13 +19,13 @@ const Home = () => {
       <>
         {arrTypes.map((item: any, index) => {
           return (
-            <Text  suppressHighlighting={true} onPress={()=>onPressType(item) } key={index} style={{ fontSize: 18, fontWeight: '600', marginLeft: index === 0 ? 5 : 25, color:selType===item?"black":"gray" }}>{item}</Text>
+            <Text suppressHighlighting={true} onPress={() => onPressType(item)} key={index} style={{ fontSize: 18, fontWeight: '600', marginLeft: index === 0 ? 5 : 25, color: selType === item ? "black" : "gray" }}>{item}</Text>
           )
         })}
       </>
     )
   }
-  const cardView = (item:any) => {
+  const cardView = (item: any) => {
     return (
       <View key={item.id} style={[styles.carView]} >
         <View>
@@ -40,12 +40,13 @@ const Home = () => {
   }
   useEffect(() => {
     if (!isSuccess) return;
-    const filteredData = products.filter(item =>{
-        if(selType==='All'){
-      return item
-    }else {
-      return item.brand===selType
-    }}
+    const filteredData = products.filter(item => {
+      if (selType === 'All') {
+        return item
+      } else {
+        return item.brand === selType
+      }
+    }
     );
     setData(filteredData);
   }, [products, isSuccess, selType]);
@@ -53,7 +54,9 @@ const Home = () => {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Menu width={30} height={30} />
-        <Profile width={30} height={30} />
+        <Pressable onPress={()=>navigation.navigate('Profile')}>
+          <Profile width={30} height={30} />
+        </Pressable>
       </View>
       <Text style={styles.rent_txt}>Rent a Car</Text>
       <View style={styles.search}>
@@ -73,7 +76,7 @@ const Home = () => {
         data={arrdata}
         keyExtractor={item => item.id.toString()}
         renderItem={(({ item }: any) => cardView(item))}
-        ListFooterComponent={()=><View style={{height:60}}/>}
+        ListFooterComponent={() => <View style={{ height: 60 }} />}
       />
 
     </SafeAreaView>
